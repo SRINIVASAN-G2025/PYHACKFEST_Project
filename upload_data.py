@@ -15,4 +15,4 @@ collection = db["pollution"]
 # Insert data
 collection.insert_many(data)
 
-print("✅ Data inserted successfully!")
+print(" Data inserted successfully!")
