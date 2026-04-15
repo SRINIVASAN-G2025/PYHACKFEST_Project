@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Eco Monitor</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background: #eef4fb;
+            color: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: #f8fafc;
+            padding: 30px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 36px;
+        }
+
+        .brand-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: radial-gradient(circle at top left, #22c55e, #3b82f6);
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .nav-item.active,
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar .bottom-links {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .main-area {
+            flex: 1;
+            padding: 28px;
+        }
+
+        .topbar {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            border-radius: 18px;
+            padding: 14px 18px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+            color: #0f172a;
+            background: transparent;
+        }
+
+        .stats-panel {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 18px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .stat-card span {
+            display: block;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .stat-card strong {
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1.4fr 0.9fr;
+            grid-template-rows: auto auto auto;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            grid-column: span 2;
+        }
+
+        .summary-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+        }
+
+        .summary-card .metric {
+            color: #0f172a;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .summary-card .label {
+            color: #64748b;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .summary-card .trend {
+            margin-top: 8px;
+            color: #10b981;
+            font-size: 13px;
+        }
+
+        .small-graph {
+            margin-top: 18px;
+            height: 98px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(59,130,246,0.16), rgba(34,197,94,0.16));
+        }
+
+        .full-graph {
+            display: flex;
+            flex-direction: column;
+            height: 320px;
+            gap: 18px;
+        }
+
+        .full-graph h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .chart-area {
+            flex: 1;
+            background: linear-gradient(180deg, rgba(14,165,233,0.16), rgba(79,70,229,0.08));
+            border-radius: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-area::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle at 10% 20%, rgba(34,197,94,0.24), transparent 18%),
+                              radial-gradient(circle at 85% 30%, rgba(59,130,246,0.16), transparent 14%);
+        }
+
+        .mini-panel {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #334155;
+        }
+
+        .panel-text {
+            margin: 0;
+            color: #0f172a;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .source-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .source-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #f8fafc;
+        }
+
+        .source-item span:first-child {
+            color: #475569;
+        }
+
+        .source-item span:last-child {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .panel-stack {
+            display: grid;
+            gap: 20px;
+        }
+
+        .right-panel {
+            display: grid;
+            gap: 20px;
+            grid-row: span 3;
+        }
+
+        .health-card {
+            display: grid;
+            gap: 16px;
+        }
+
+        .health-card h3,
+        .health-card h4 {
+            margin: 0;
+            color: #0f172a;
+        }
+
+        .health-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: #f8fafc;
+            color: #334155;
+        }
+
+        .health-item strong {
+            color: #0f172a;
+        }
+
+        .source-chart {
+            height: 180px;
+            border-radius: 24px;
+            background: linear-gradient(180deg, rgba(34,197,94,0.12), rgba(59,130,246,0.06));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f172a;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .legend-row {
+            display: grid;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .legend-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border-radius: 999px;
+            padding: 10px 14px;
+            color: #334155;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .legend-color.traffic { background: #38bdf8; }
+        .legend-color.industry { background: #22c55e; }
+        .legend-color.residential { background: #a78bfa; }
+        .legend-color.natural { background: #facc15; }
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-dot"></span>
+            <div>
+                <div class="brand-title">Eco Monitor</div>
+                <div style="font-size: 12px; color: #94a3b8;">Berlin</div>
+            </div>
+        </div>
+
+        <nav>
+            <a href="/overview" class="nav-item">Overview</a>
+            <a href="/" class="nav-item">Air quality</a>
+            <a href="/water/" class="nav-item active">Water quality</a>
+            <a href="/soil/" class="nav-item">Soil quality</a>
+        </nav>
+
+        <div class="bottom-links">
+            <div class="nav-item">Profile</div>
+            <div class="nav-item">Log out</div>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <div class="topbar">
+            <div class="search-box">
+                <span>🔍</span>
+                <input placeholder="Search" />
+            </div>
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <span>Temperature</span>
+                    <strong>+18°</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Wind</span>
+                    <strong>3.6 km/h</strong>
+                </div>
+                <div class="stat-card">
+                    <span>Pressure</span>
+                    <strong>1023 mb</strong>
+                </div>
+                <div class="stat-card">
+                    <span>UV Index</span>
+                    <strong>5</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <section class="card summary-cards">
+                <div class="summary-card">
+                    <div>
+                        <div class="label">PM 2.5</div>
+                        <div class="metric">9 / 8</div>
+                        <div class="trend">Berlin / Germany</div>
+                    </div>
+                    <div class="badge">24h</div>
+                    <div class="small-graph"></div>
+                </div>
+                <div class="summary-card">
+                    <div>
+                        <div class="label">PM 10</div>
+                        <div class="metric">20 / 15</div>
+                        <div class="trend">Berlin / Germany</div>
+                    </div>
+                    <div class="badge">24h</div>
+                    <div class="small-graph"></div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="panel-title">Health impact</div>
+                <div class="health-card">
+                    <div class="health-item"><span>Respiratory</span><strong>1458</strong></div>
+                    <div class="health-item"><span>Mental health</span><strong>934</strong></div>
+                    <div class="health-item"><span>Cardiovascular</span><strong>790</strong></div>
+                    <div class="health-item"><span>Neurological</span><strong>483</strong></div>
+                </div>
+                <div class="panel-title" style="margin-top: 18px;">Air pollution sources</div>
+                <div class="legend-row">
+                    <span class="legend-chip"><span class="legend-color traffic"></span> Traffic</span>
+                    <span class="legend-chip"><span class="legend-color industry"></span> Industry</span>
+                    <span class="legend-chip"><span class="legend-color residential"></span> Residential</span>
+                    <span class="legend-chip"><span class="legend-color natural"></span> Natural</span>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="panel-title">Air quality index</div>
+                <div class="panel-text">55 / 43</div>
+                <div class="source-list">
+                    <div class="source-item"><span>24 hours</span><span>Active</span></div>
+                    <div class="source-item"><span>1 week</span><span>Stable</span></div>
+                    <div class="source-item"><span>1 month</span><span>Improving</span></div>
+                </div>
+            </section>
+
+            <section class="card full-graph">
+                <h3>Air Quality Index in Berlin vs German mean</h3>
+                <div class="chart-area"></div>
+            </section>
+
+            <section class="card mini-panel">
+                <div>
+                    <div class="panel-title">Pollen index</div>
+                    <p class="panel-text">4 / 2</p>
+                    <div style="color:#475569; margin-top: 10px;">Tree: 4 · Grass: 0 · Weed: 0</div>
+                </div>
+                <div class="source-list">
+                    <div class="source-item"><span>Very high</span><span>Tree</span></div>
+                    <div class="source-item"><span>Normal</span><span>Grass</span></div>
+                    <div class="source-item"><span>Normal</span><span>Weed</span></div>
+                </div>
+            </section>
+
+            <section class="card mini-panel">
+                <div>
+                    <div class="panel-title">Pollutants source</div>
+                    <div class="source-item"><span>PM2.5</span><span>50%</span></div>
+                    <div class="source-item"><span>NO2</span><span>30%</span></div>
+                    <div class="source-item"><span>SO2</span><span>20%</span></div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="panel-title">Air pollution sources</div>
+                <div class="source-chart">Traffic 40% · Industry 30% · Residential 20% · Natural 10%</div>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>
